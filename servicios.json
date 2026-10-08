@@ -1,0 +1,148 @@
+{
+  "_ayuda": [
+    "Edita este archivo para definir grupos, etiquetas, servicios esperados y umbrales de alertas. Los cambios se aplican en la siguiente comprobación (sin reiniciar).",
+    "Cada máquina se identifica por su nombre exacto en VirtualBox; 'host' es este equipo.",
+    "Servicios: 'tipo' puede ser 'tcp' (solo confirma que el puerto acepta la conexión), 'http' o 'https' (hace un GET sin credenciales a 'ruta' y confirma que la aplicación contesta con un código HTTP menor que 500).",
+    "Solo se comprueban estos puertos y solo en IPs de tus VM encendidas alcanzables desde este equipo."
+  ],
+  "ajustes": {
+    "_ayuda": "avisoMemoriaEquipo/avisoCpuEquipo: porcentaje; minutos*: cuánto debe sostenerse antes de avisar. avisarInterrumpidaTrasDias: días en estado interrumpido. graciaArranqueSegundos: tiempo tras encender una VM sin avisar de servicios. intervaloRegistroSegundos: cada cuánto se guarda el estado en el historial. diasRetencion: días que se conservan.",
+    "tiempoLimiteSegundos": 1.5,
+    "avisoMemoriaEquipo": 90,
+    "minutosMemoriaAlta": 5,
+    "avisoCpuEquipo": 90,
+    "minutosCpuAlta": 5,
+    "avisarInterrumpidaTrasDias": 2,
+    "graciaArranqueSegundos": 120,
+    "intervaloRegistroSegundos": 30,
+    "diasRetencion": 30
+  },
+  "maquinas": {
+    "host": {
+      "grupo": "Equipo principal",
+      "etiquetas": [
+        "Anfitrión"
+      ]
+    },
+    "GNS3 VM": {
+      "grupo": "Redes",
+      "etiquetas": [
+        "Simulación de red"
+      ],
+      "servicios": [
+        {
+          "nombre": "Servidor web de GNS3",
+          "puerto": 80,
+          "tipo": "http",
+          "ruta": "/"
+        }
+      ]
+    },
+    "PC01": {
+      "grupo": "Windows",
+      "etiquetas": [
+        "Cliente",
+        "Active Directory"
+      ],
+      "servicios": [
+        {
+          "nombre": "RDP",
+          "puerto": 3389,
+          "tipo": "tcp"
+        }
+      ]
+    },
+    "DC01": {
+      "grupo": "Windows",
+      "etiquetas": [
+        "Active Directory",
+        "Servidor"
+      ],
+      "servicios": [
+        {
+          "nombre": "DNS",
+          "puerto": 53,
+          "tipo": "tcp"
+        },
+        {
+          "nombre": "LDAP",
+          "puerto": 389,
+          "tipo": "tcp"
+        },
+        {
+          "nombre": "RDP",
+          "puerto": 3389,
+          "tipo": "tcp"
+        }
+      ]
+    },
+    "wazuh-server": {
+      "grupo": "Seguridad",
+      "etiquetas": [
+        "SIEM",
+        "Linux"
+      ],
+      "servicios": [
+        {
+          "nombre": "SSH",
+          "puerto": 22,
+          "tipo": "tcp"
+        },
+        {
+          "nombre": "Panel de Wazuh",
+          "puerto": 443,
+          "tipo": "https",
+          "ruta": "/"
+        },
+        {
+          "nombre": "API de Wazuh",
+          "puerto": 55000,
+          "tipo": "https",
+          "ruta": "/"
+        }
+      ]
+    },
+    "SecSrv01": {
+      "grupo": "Seguridad",
+      "etiquetas": [
+        "Servidor",
+        "Linux"
+      ],
+      "servicios": [
+        {
+          "nombre": "SSH",
+          "puerto": 22,
+          "tipo": "tcp"
+        }
+      ]
+    },
+    "SecSrv01-desatendida": {
+      "grupo": "Seguridad",
+      "etiquetas": [
+        "Servidor",
+        "Linux"
+      ],
+      "servicios": [
+        {
+          "nombre": "SSH",
+          "puerto": 22,
+          "tipo": "tcp"
+        }
+      ]
+    },
+    "Kali": {
+      "grupo": "Seguridad",
+      "etiquetas": [
+        "Pentest",
+        "Linux"
+      ],
+      "servicios": [
+        {
+          "nombre": "SSH",
+          "puerto": 22,
+          "tipo": "tcp"
+        }
+      ]
+    }
+  }
+}

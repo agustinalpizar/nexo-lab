@@ -1,0 +1,34 @@
+{
+  "_ayuda": [
+    "Configuración de la consola de Control. NO escribas aquí contraseñas, claves ni tokens: las credenciales se guardan en el Administrador de credenciales de Windows (ver README, «Control»).",
+    "maquinas: VM que el panel puede encender o apagar. Deben coincidir con el nombre exacto en VirtualBox. Cualquier otra VM aparece como «fuera del laboratorio» y no admite acciones.",
+    "activeDirectory: dónde está el controlador de dominio y qué credencial de Windows usar. ouPermitidas limita los cambios (desbloquear, habilitar, deshabilitar, restablecer) a cuentas dentro de esas OU; si está vacía, solo se permite consultar.",
+    "correcciones: por VM, qué servicio corresponde a cada puerto comprobado y cómo se puede iniciar o reiniciar. Solo se pueden tocar los servicios listados aquí. Este catálogo lo editas tú; ni el panel ni un asistente pueden cambiarlo."
+  ],
+  "maquinas": ["DC01", "PC01", "wazuh-server", "SecSrv01", "SecSrv01-desatendida", "Kali", "GNS3 VM"],
+  "activeDirectory": {
+    "vm": "DC01",
+    "servidor": null,
+    "_servidor": "null = usar la IP de DC01 que detecta el panel. Puedes fijar una IP o nombre, por ejemplo \"192.168.56.10\".",
+    "credencial": "NexoLab:AD",
+    "ouPermitidas": []
+  },
+  "correcciones": {
+    "DC01": {
+      "metodo": "winrm",
+      "credencial": "NexoLab:WinRM",
+      "servicios": { "3389": "TermService", "53": "DNS" }
+    },
+    "wazuh-server": {
+      "metodo": "ssh",
+      "usuario": null,
+      "_usuario": "Usuario de la VM con sudo limitado a systemctl start/restart de estos servicios (ver README). null = deshabilitado.",
+      "servicios": { "443": "wazuh-dashboard", "55000": "wazuh-manager", "22": "ssh" }
+    },
+    "SecSrv01": {
+      "metodo": "ssh",
+      "usuario": null,
+      "servicios": { "22": "ssh" }
+    }
+  }
+}

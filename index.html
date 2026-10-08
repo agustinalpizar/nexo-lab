@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <title>Nexo Lab · Centro de operaciones</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/styles.css?v=26">
+</head>
+<body>
+  <a class="skip" href="#maquinas">Saltar a las máquinas</a>
+
+  <aside class="side">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">N</span><span class="brand-name" translate="no">Nexo Lab</span></div>
+    <button type="button" class="side-cmd" id="paleta-side" aria-haspopup="dialog" aria-keyshortcuts="Control+K">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14zM20 20l-4-4"/></svg>
+      Ir a…<kbd>Ctrl K</kbd>
+    </button>
+    <nav aria-label="Secciones">
+      <p class="nav-sec" aria-hidden="true">Monitoreo</p>
+      <a href="#resumen" data-icon="grid"><span class="nav-l">Resumen</span></a>
+      <a href="#alertas" data-icon="warn"><span class="nav-l">Alertas</span></a>
+      <a href="#maquinas" data-icon="server"><span class="nav-l">Máquinas</span></a>
+      <a href="#red" data-icon="net"><span class="nav-l">Red</span></a>
+      <a href="#actividad" data-icon="clock"><span class="nav-l">Actividad</span></a>
+      <p class="nav-sec" aria-hidden="true">Operaciones</p>
+      <a href="#control" data-icon="power" class="nav-control"><span class="nav-l">Control</span></a>
+    </nav>
+    <div class="side-foot">
+      <p class="side-demo" id="side-demo" hidden><span class="side-demo-t">Modo demo</span><span class="side-demo-d">Datos de ejemplo</span></p>
+      <p class="side-conn" id="side-conn" role="status"></p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="head">
+      <div class="head-text">
+        <h1>Centro de operaciones</h1>
+        <p class="sub"><span id="estado-general" class="overall"></span><span id="ultima" class="updated"></span></p>
+      </div>
+      <div class="head-actions">
+        <button id="paleta-btn" type="button" class="btn" aria-haspopup="dialog" aria-keyshortcuts="Control+K">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14zM20 20l-4-4"/></svg>
+          Acciones rápidas <kbd class="kbd-hint">Ctrl K</kbd>
+        </button>
+        <button id="configurar" type="button" class="btn" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4"/></svg>
+          Configurar
+        </button>
+        <button id="exportar" type="button" class="btn" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+          Exportar
+        </button>
+        <button id="actualizar" type="button" class="btn primary">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5"/></svg>
+          Actualizar
+        </button>
+      </div>
+    </header>
+
+    <p class="demo-note" role="status" id="demo-banner">Leyendo VirtualBox…</p>
+    <p class="demo-note src-stale ui-old" role="alert" id="ui-aviso" hidden></p>
+
+    <section id="resumen" aria-labelledby="t-resumen">
+      <h2 id="t-resumen" class="vh">Resumen</h2>
+      <div id="hero" class="hero" role="status" aria-live="polite"></div>
+      <div id="tiles" class="tiles"></div>
+    </section>
+
+    <section id="alertas" aria-labelledby="t-alertas" class="block">
+      <div class="section-head">
+        <h2 id="t-alertas">Alertas de salud</h2>
+        <p class="hint" id="alertas-hint"></p>
+      </div>
+      <ul id="lista-alertas" class="group alerts"></ul>
+      <p class="g-foot" id="umbrales"></p>
+    </section>
+
+    <section id="maquinas" aria-labelledby="t-maq" class="block">
+      <div class="section-head">
+        <h2 id="t-maq">Máquinas</h2>
+        <p class="hint">Pulsa una máquina para ver sus detalles.</p>
+      </div>
+      <div class="tools">
+        <div class="search">
+          <label for="buscar" class="vh">Buscar por nombre, IP o etiqueta</label>
+          <svg class="search-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14zM20 20l-4-4"/></svg>
+          <input id="buscar" type="search" autocomplete="off" placeholder="Buscar por nombre, IP o etiqueta…" aria-keyshortcuts="/">
+          <kbd aria-hidden="true">/</kbd>
+        </div>
+        <fieldset class="segmented" id="filtros">
+          <legend class="vh">Filtrar por estado</legend>
+        </fieldset>
+        <div class="segmented view" role="group" aria-label="Tipo de vista">
+          <button type="button" id="v-tarjetas" aria-pressed="true">Tarjetas</button>
+          <button type="button" id="v-lista" aria-pressed="false">Lista</button>
+        </div>
+      </div>
+      <div class="tools tools-2">
+        <fieldset class="segmented" id="grupos">
+          <legend class="vh">Filtrar por grupo</legend>
+        </fieldset>
+      </div>
+      <p id="conteo" class="count" role="status" aria-live="polite"></p>
+      <div id="lista" class="machines"></div>
+    </section>
+
+    <section id="red" aria-labelledby="t-red" class="block">
+      <div class="section-head">
+        <h2 id="t-red">Red del laboratorio</h2>
+        <p class="hint">Cómo está conectada cada máquina, según los adaptadores configurados en VirtualBox.</p>
+        <div class="segmented view" role="group" aria-label="Vista de la red">
+          <button type="button" id="red-mapa" aria-pressed="true">Mapa</button>
+          <button type="button" id="red-lista" aria-pressed="false">Lista</button>
+        </div>
+      </div>
+      <div id="mapa-red" class="netmap"></div>
+      <div id="redes" class="networks" hidden></div>
+    </section>
+
+    <section id="actividad" aria-labelledby="t-act" class="block">
+      <div class="section-head">
+        <h2 id="t-act">Actividad</h2>
+        <span class="chip chip-demo" hidden>Demo</span>
+      </div>
+      <div class="two">
+        <div>
+          <h3 class="g-title first">Historial guardado</h3>
+          <div class="hist-filters" role="group" aria-label="Filtrar el historial">
+            <label>Máquina <select id="hf-maquina"><option value="">Todas</option></select></label>
+            <label>Tipo <select id="hf-tipo">
+              <option value="">Todos</option><option value="estado">Estado de VM</option><option value="servicio">Servicios</option>
+              <option value="alerta">Alertas</option><option value="alerta_resuelta">Alertas resueltas</option><option value="sin_datos">Sin datos</option>
+            </select></label>
+            <label>Periodo <select id="hf-horas">
+              <option value="">Todo</option><option value="24">Últimas 24 h</option><option value="168">Últimos 7 días</option><option value="720">Últimos 30 días</option>
+            </select></label>
+          </div>
+          <p class="count" id="hf-conteo" role="status" aria-live="polite"></p>
+          <ol id="historial" class="group activity"></ol>
+          <p class="g-foot" id="hist-foot"></p>
+        </div>
+        <div>
+          <h3 class="g-title first">Último cambio registrado por VirtualBox</h3>
+          <ol id="act" class="group activity"></ol>
+        </div>
+      </div>
+      <h3 class="g-title">Leyenda</h3>
+      <ul class="group legend" id="leyenda"></ul>
+    </section>
+
+    <section id="control" aria-labelledby="t-control" class="block control-zone">
+      <div class="section-head">
+        <h2 id="t-control">Control</h2>
+        <p class="hint">Aquí sí se <strong>cambian</strong> cosas: encender o apagar VM, cuentas de Active Directory y servicios. Cada acción se confirma antes de ejecutarse y queda registrada. El resto del panel solo lee.</p>
+      </div>
+      <p class="ctl-banner" id="ctl-banner" role="status"></p>
+      <div id="ctl-cuerpo">
+        <h3 class="g-title first">Qué puede hacer el panel ahora</h3>
+        <ul class="group" id="ctl-mecanismos"></ul>
+        <h3 class="g-title">Máquinas virtuales</h3>
+        <p class="hint ctl-hint">Encendido y apagado normal (como pulsar el botón de encendido). Nunca se fuerza el apagado.</p>
+        <ul class="group" id="ctl-vms"></ul>
+        <h3 class="g-title">Active Directory</h3>
+        <div id="ctl-ad"></div>
+        <h3 class="g-title">Correcciones de servicios</h3>
+        <p class="hint ctl-hint">Solo acciones predefinidas en <code>control.json</code> para alertas activas. La guía de cada alerta indica cuándo tiene sentido usarlas.</p>
+        <ul class="group" id="ctl-fixes"></ul>
+        <h3 class="g-title">Asistente de diagnóstico (Hermes u OpenCode)</h3>
+        <div id="ctl-asistente"></div>
+        <h3 class="g-title">Registro de acciones</h3>
+        <p class="hint ctl-hint" id="ctl-registro-hint"></p>
+        <ol class="group activity" id="ctl-registro"></ol>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="detalle" class="sheet" aria-labelledby="d-titulo">
+    <div class="sheet-bar">
+      <span class="sheet-demo chip">Demo</span>
+      <button type="button" class="btn plain" id="d-cerrar">Cerrar</button>
+    </div>
+    <div class="sheet-body" id="d-cuerpo"></div>
+  </dialog>
+
+  <dialog id="dlg-exportar" class="sheet" aria-labelledby="e-titulo">
+    <div class="sheet-bar">
+      <h2 id="e-titulo" class="sheet-title">Exportar reporte</h2>
+      <button type="button" class="btn plain" id="e-cerrar">Cerrar</button>
+    </div>
+    <div class="sheet-body">
+      <p class="hint">Genera un archivo en tu equipo con el estado actual. Nada se envía a internet. Revisa la vista previa antes de compartirlo.</p>
+      <h3 class="g-title">Privacidad</h3>
+      <ul class="group">
+        <li class="g-row"><label class="check" for="e-ip"><input type="checkbox" id="e-ip" checked> Ocultar direcciones IP</label></li>
+        <li class="g-row"><label class="check" for="e-host"><input type="checkbox" id="e-host" checked> Ocultar el nombre del equipo principal</label></li>
+      </ul>
+      <h3 class="g-title">Contenido</h3>
+      <ul class="group">
+        <li class="g-row"><label class="check" for="e-svc"><input type="checkbox" id="e-svc" checked> Incluir servicios comprobados</label></li>
+        <li class="g-row"><label class="check" for="e-alert"><input type="checkbox" id="e-alert" checked> Incluir alertas de salud</label></li>
+        <li class="g-row">
+          <span class="g-l" id="e-fmt-l">Formato</span>
+          <span class="segmented small" role="radiogroup" aria-labelledby="e-fmt-l">
+            <label><input type="radio" name="e-fmt" value="md" checked><span>Markdown</span></label>
+            <label><input type="radio" name="e-fmt" value="json"><span>JSON</span></label>
+          </span>
+        </li>
+      </ul>
+      <h3 class="g-title">Vista previa</h3>
+      <label for="e-vista" class="vh">Vista previa del reporte</label>
+      <textarea id="e-vista" class="preview" readonly rows="12" spellcheck="false"></textarea>
+      <div class="sheet-actions">
+        <button type="button" class="btn" id="e-copiar">Copiar</button>
+        <button type="button" class="btn primary" id="e-descargar">Descargar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-nota" class="sheet" aria-labelledby="n-titulo">
+    <div class="sheet-bar">
+      <h2 id="n-titulo" class="sheet-title">Documentar evento</h2>
+      <button type="button" class="btn plain" id="n-cerrar">Cerrar</button>
+    </div>
+    <div class="sheet-body">
+      <p class="hint">Nota en Markdown compatible con Obsidian (propiedades, etiquetas y enlaces <code>[[ ]]</code>). El panel solo rellena lo que observó: completa el diagnóstico y revisa el texto antes de guardarlo.</p>
+      <p class="note-file">Archivo: <span id="n-archivo" class="mono"></span></p>
+      <label for="n-texto" class="vh">Texto de la nota (editable)</label>
+      <textarea id="n-texto" class="preview note-text" rows="18" spellcheck="true"></textarea>
+      <p class="vault-status" id="n-boveda" role="status"></p>
+      <div class="confirm" id="n-confirmar" hidden>
+        <p><strong>¿Guardar esta nota en tu bóveda?</strong> Se creará un archivo nuevo; no se modifica ni se sobrescribe ninguna nota existente.</p>
+        <p class="mono confirm-path" id="n-ruta"></p>
+        <p class="confirm-warn" id="n-aviso" hidden></p>
+        <div class="sheet-actions">
+          <button type="button" class="btn" id="n-cancelar">Cancelar</button>
+          <button type="button" class="btn primary" id="n-confirmar-btn">Guardar en la bóveda</button>
+        </div>
+      </div>
+      <div class="sheet-actions" id="n-acciones">
+        <button type="button" class="btn" id="n-copiar">Copiar</button>
+        <button type="button" class="btn" id="n-descargar">Descargar .md</button>
+        <button type="button" class="btn primary" id="n-obsidian">Guardar en Obsidian…</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-guia" class="sheet wide" aria-labelledby="g-titulo">
+    <div class="sheet-bar">
+      <span class="sheet-title">Guía de solución</span>
+      <button type="button" class="btn plain" id="g-cerrar">Cerrar</button>
+    </div>
+    <div class="sheet-body" id="g-cuerpo"></div>
+  </dialog>
+
+  <dialog id="dlg-config" class="sheet wide" aria-labelledby="c-titulo">
+    <div class="sheet-bar">
+      <h2 id="c-titulo" class="sheet-title">Configurar servicios y umbrales</h2>
+      <button type="button" class="btn plain" id="c-cerrar">Cerrar</button>
+    </div>
+    <div class="sheet-body">
+      <p class="hint">Edita qué se comprueba en cada máquina y cuándo se avisa. Al guardar se valida todo, se hace una copia del <code>servicios.json</code> anterior en <code>data/copias-config/</code> y el cambio se aplica en la siguiente comprobación. Nada de esto cambia tus máquinas virtuales.</p>
+      <form id="c-form" novalidate></form>
+      <div class="confirm" id="c-confirmar" hidden>
+        <p><strong>¿Guardar estos cambios en servicios.json?</strong></p>
+        <ul class="change-list" id="c-cambios"></ul>
+        <div class="sheet-actions">
+          <button type="button" class="btn" id="c-volver">Seguir editando</button>
+          <button type="button" class="btn primary" id="c-guardar">Guardar cambios</button>
+        </div>
+      </div>
+      <p class="confirm-warn" id="c-error" role="alert" hidden></p>
+      <div class="sheet-actions" id="c-acciones">
+        <button type="button" class="btn primary" id="c-revisar">Revisar cambios…</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-accion" class="sheet" aria-labelledby="a-titulo">
+    <div class="sheet-bar">
+      <h2 id="a-titulo" class="sheet-title">Confirmar acción</h2>
+      <button type="button" class="btn plain" id="a-cerrar">Cerrar</button>
+    </div>
+    <div class="sheet-body" id="a-cuerpo"></div>
+  </dialog>
+
+  <dialog id="paleta" class="palette" aria-label="Acciones rápidas">
+    <div class="pal-in">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14zM20 20l-4-4"/></svg>
+      <input id="pal-q" type="text" autocomplete="off" spellcheck="false" placeholder="Buscar sección, máquina, alerta o acción…"
+        role="combobox" aria-expanded="true" aria-controls="pal-lista" aria-autocomplete="list">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="pal-list" id="pal-lista" role="listbox" aria-label="Resultados"></div>
+    <div class="pal-foot" aria-hidden="true"><span><kbd>↑</kbd><kbd>↓</kbd> moverse</span><span><kbd>Enter</kbd> abrir</span><span><kbd>Esc</kbd> cerrar</span></div>
+  </dialog>
+
+  <div id="aviso" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="js/data.js?v=26"></script>
+  <script src="js/guias.js?v=26"></script>
+  <script src="js/app.js?v=26"></script>
+  <script src="js/control.js?v=26"></script>
+  <script src="js/paleta.js?v=26"></script>
+</body>
+</html>

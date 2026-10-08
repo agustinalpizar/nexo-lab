@@ -1,0 +1,7 @@
+# Datos privados del laboratorio: no se suben
+data/
+nexo.local.json
+*.db
+*.jsonl
+__pycache__/
+*.pyc

@@ -1,0 +1,7 @@
+{
+  "_ayuda": "Copia este archivo como nexo.local.json (no se sube a Git) y escribe la ruta de tu bóveda de Obsidian. En JSON cada barra invertida se escribe doble: C:\\Users\\tu-usuario\\Documents\\MiBoveda. La bóveda debe existir y contener la carpeta .obsidian. 'carpeta' es la subcarpeta de la bóveda donde se guardan las notas del panel.",
+  "obsidian": {
+    "boveda": "",
+    "carpeta": "Nexo Lab"
+  }
+}
