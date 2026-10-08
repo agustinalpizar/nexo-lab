@@ -220,7 +220,7 @@ Ideas, no compromisos, ordenadas por valor:
 
 ## Proyecto hermano: analizador de alertas Wazuh
 
-Junto a Nexo Lab hay una segunda herramienta, `wazuh-analizador/` (en una carpeta aparte; **no está incluida en este repositorio**): una página local y **educativa** que lee **una** alerta de Wazuh en JSON y separa lo que está literalmente en el evento (azul), lo derivado (gris) y las posibles interpretaciones, cada una con los campos en que se apoya (ámbar). Indica qué información falta y qué pasos seguros de solo lectura seguir.
+Junto a Nexo Lab hay una segunda herramienta, [`wazuh-analizador`](https://github.com/agustinalpizar/wazuh-analizador) (repositorio aparte; **no está incluido aquí**): una página local y **educativa** que lee **una** alerta de Wazuh en JSON y separa lo que está literalmente en el evento (azul), lo derivado (gris) y las posibles interpretaciones, cada una con los campos en que se apoya (ámbar). Indica qué información falta y qué pasos seguros de solo lectura seguir.
 
 No usa red (CSP `connect-src 'none'`), no guarda nada, inserta el contenido siempre como texto y no inventa campos ausentes. Se ejecuta con `python -m http.server 8765 --bind 127.0.0.1` y tiene sus propias pruebas (`node --test`). Las dos herramientas comparten el tema de lectura de alertas, pero **no están integradas**; unirlas es una idea de la hoja de ruta.
 
@@ -258,4 +258,4 @@ data/                  Historial y registro de acciones (local; no se sube a Git
 
 ## Licencia
 
-Todavía no se ha elegido una licencia. Hasta entonces, todos los derechos están reservados. Si vas a reutilizar o publicar este código, conviene añadir una (MIT es la opción habitual).
+[MIT](LICENSE) © 2026 Agustín Alpízar Hernández.
